@@ -23,15 +23,39 @@ app.title = "EquityLens"
 # =========================
 
 def get_stock_data(ticker):
-    data = yf.download(
-        ticker,
-        period="1y",
-        interval="1d",
-        auto_adjust=False,
-        progress=False
-    )
+    try:
+        data = yf.download(
+            ticker,
+            period="1y",
+            interval="1d",
+            auto_adjust=True,
+            progress=False,
+            threads=False,
+            timeout=20
+        )
 
-    if data.empty:
+        if data is None or data.empty:
+            print(f"No Yahoo Finance data returned for {ticker}")
+            return pd.DataFrame()
+
+        # Handle yfinance MultiIndex columns
+        if isinstance(data.columns, pd.MultiIndex):
+            data.columns = data.columns.get_level_values(0)
+
+        data = data.dropna()
+
+        # Need enough data for calculations
+        if data.empty:
+            print(f"Data became empty after cleaning for {ticker}")
+            return pd.DataFrame()
+
+        data["MA20"] = data["Close"].rolling(20).mean()
+        data["MA50"] = data["Close"].rolling(50).mean()
+
+        return data
+
+    except Exception as e:
+        print(f"Yahoo Finance error for {ticker}: {e}")
         return pd.DataFrame()
 
     # Handle yfinance multi-index columns
