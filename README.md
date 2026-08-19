@@ -21,3 +21,13 @@ EquityLens is an interactive Indian equity analytics dashboard built with Python
 - NumPy
 - Yahoo Finance
 
+## Project Structure
+
+```text
+EquityLens/
+│
+├── App.py
+├── dashboard.py
+├── main.py
+├── .gitignore
+└── README.md
