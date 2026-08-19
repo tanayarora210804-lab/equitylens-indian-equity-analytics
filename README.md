@@ -33,8 +33,6 @@ EquityLens/
 ├── .gitignore
 └── README.md
 
-### 2. Immediately underneath, paste this
-
 ```markdown
 ## ⚙️ Installation
 
