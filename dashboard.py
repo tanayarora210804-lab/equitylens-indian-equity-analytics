@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 from dash import Dash, dcc, html, Input, Output
 
 
@@ -348,7 +349,14 @@ def update_dashboard(ticker):
     # Price Chart
     # =========================
 
-    fig = go.Figure()
+    fig = make_subplots(
+        rows=2,
+        cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.08,
+        row_heights=[0.75, 0.25],
+        subplot_titles=("Price & Moving Averages", "Trading Volume")
+    )
 
     fig.add_trace(
 
@@ -356,8 +364,15 @@ def update_dashboard(ticker):
             x=data.index,
             y=data["Close"],
             mode="lines",
-            name="Closing Price"
-        )
+            name="Closing Price",
+            line=dict(
+                color="#6366f1",
+                width=2.5
+            )
+        ),
+
+        row=1,
+        col=1
     )
 
     fig.add_trace(
@@ -366,8 +381,15 @@ def update_dashboard(ticker):
             x=data.index,
             y=data["MA20"],
             mode="lines",
-            name="20-Day MA"
-        )
+            name="20-Day MA",
+            line=dict(
+                color="#ff5733",
+                width=2
+            )
+        ),
+
+        row=1,
+        col=1
     )
 
     fig.add_trace(
@@ -376,24 +398,109 @@ def update_dashboard(ticker):
             x=data.index,
             y=data["MA50"],
             mode="lines",
-            name="50-Day MA"
-        )
+            name="50-Day MA",
+            line=dict(
+                color="#00d4aa",
+                width=2
+            )
+        ),
+
+        row=1,
+        col=1
+    )
+
+    # Volume colors based on daily price movement
+    volume_colors = np.where(
+        data["Close"].diff() >= 0,
+        "#00d4aa",
+        "#ff5733"
+    )
+
+    fig.add_trace(
+
+        go.Bar(
+            x=data.index,
+            y=data["Volume"],
+            name="Volume",
+            marker=dict(
+                color=volume_colors
+            ),
+            opacity=0.65
+        ),
+
+        row=2,
+        col=1
     )
 
     fig.update_layout(
 
-        title=f"{company_name} - Price & Moving Averages",
-
-        xaxis_title="Date",
-
-        yaxis_title="Price (₹)",
+        title=dict(
+            text=f"{company_name} - Price & Trading Volume",
+            font=dict(
+                size=22,
+                color="#ffffff"
+            )
+        ),
 
         template="plotly_dark",
-        paper_bgcolor="#111c2e",
-        plot_bgcolor="#111c2e",
-        font=dict(color="#ffffff"),
 
-        hovermode="x unified"
+        paper_bgcolor="#111c2e",
+
+        plot_bgcolor="#111c2e",
+
+        font=dict(
+            color="#ffffff"
+        ),
+
+        hovermode="x unified",
+
+        height=700,
+
+        margin=dict(
+            l=60,
+            r=30,
+            t=80,
+            b=50
+        ),
+
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="left",
+            x=0
+        )
+    )
+
+    fig.update_xaxes(
+        showgrid=True,
+        gridcolor="#26354a",
+        row=1,
+        col=1
+    )
+
+    fig.update_xaxes(
+        showgrid=True,
+        gridcolor="#26354a",
+        title_text="Date",
+        row=2,
+        col=1
+    )
+
+    fig.update_yaxes(
+        title_text="Price (₹)",
+        showgrid=True,
+        gridcolor="#26354a",
+        row=1,
+        col=1
+    )
+
+    fig.update_yaxes(
+        title_text="Volume",
+        showgrid=True,
+        gridcolor="#26354a",
+        row=2,
+        col=1
     )
 
 
