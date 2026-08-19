@@ -13,6 +13,7 @@ from dash import Dash, dcc, html, Input, Output
 # =========================
 
 app = Dash(__name__)
+server = app.server
 
 app.title = "EquityLens"
 
