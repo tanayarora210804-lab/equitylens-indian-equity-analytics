@@ -34,6 +34,7 @@ def get_stock_data(ticker):
             timeout=20
         )
 
+
         if data is None or data.empty:
             print(f"No Yahoo Finance data returned for {ticker}")
             return pd.DataFrame()
@@ -50,6 +51,7 @@ def get_stock_data(ticker):
             return pd.DataFrame()
 
         data["MA20"] = data["Close"].rolling(20).mean()
+        data["Daily Return"] = data["Close"].pct_change()
         data["MA50"] = data["Close"].rolling(50).mean()
 
         return data
